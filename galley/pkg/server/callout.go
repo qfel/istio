@@ -17,7 +17,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -33,7 +32,7 @@ type callout struct {
 	do       []grpc.DialOption
 	cancel   context.CancelFunc
 	pt       calloutPatchTable
-	metadata []string
+	metadata metadata.MD
 }
 
 // Test override types
@@ -64,12 +63,12 @@ func defaultCalloutPT() calloutPatchTable {
 // existing auth plugin under
 // istio.io/istio/galley/pkg/authplugins. Metadata elements should be
 // in the format of "key=value".
-func newCallout(address, auth string, metadata []string,
+func newCallout(address, auth string, metadata metadata.MD,
 	so *source.Options) (*callout, error) {
 	return newCalloutPT(address, auth, metadata, so, defaultCalloutPT())
 }
 
-func newCalloutPT(address, auth string, metadata []string, so *source.Options,
+func newCalloutPT(address, auth string, metadata metadata.MD, so *source.Options,
 	pt calloutPatchTable) (*callout, error) {
 	auths := authplugins.AuthMap()
 
@@ -83,23 +82,12 @@ func newCalloutPT(address, auth string, metadata []string, so *source.Options,
 		return nil, err
 	}
 
-	m := make([]string, 0)
-
-	for _, v := range metadata {
-		kv := strings.Split(v, "=")
-		if len(kv) != 2 || kv[0] == "" || kv[1] == "" {
-			return nil, fmt.Errorf(
-				"sinkMeta not in key=value format: %v", v)
-		}
-		m = append(m, kv[0], kv[1])
-	}
-
 	return &callout{
 		address:  address,
 		so:       so,
 		do:       opts,
 		pt:       pt,
-		metadata: m,
+		metadata: metadata,
 	}, nil
 }
 
@@ -118,7 +106,7 @@ func (c *callout) Run() {
 
 	mcpClient := c.pt.sourceNewClient(client, c.so)
 	scope.Infof("Starting MCP Source Client connection to: %v", c.address)
-	ctx = metadata.AppendToOutgoingContext(ctx, c.metadata...)
+	ctx = metadata.NewOutgoingContext(ctx, c.metadata)
 	mcpClient.Run(ctx)
 }
 

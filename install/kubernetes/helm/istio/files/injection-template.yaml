@@ -20,8 +20,6 @@ initContainers:
   - "{{ annotation .ObjectMeta `traffic.sidecar.istio.io/includeOutboundIPRanges` .Values.global.proxy.includeIPRanges }}"
   - "-x"
   - "{{ annotation .ObjectMeta `traffic.sidecar.istio.io/excludeOutboundIPRanges` .Values.global.proxy.excludeIPRanges }}"
-  - "-b"
-  - "{{ annotation .ObjectMeta `traffic.sidecar.istio.io/includeInboundPorts` (includeInboundPorts .Spec.Containers) }}"
   - "-d"
   - "{{ excludeInboundPort (annotation .ObjectMeta `status.sidecar.istio.io/port` .Values.global.proxy.statusPort) (annotation .ObjectMeta `traffic.sidecar.istio.io/excludeInboundPorts` .Values.global.proxy.excludeInboundPorts) }}"
   {{ if (isset .ObjectMeta.Annotations `traffic.sidecar.istio.io/kubevirtInterfaces`) -}}
@@ -99,7 +97,11 @@ containers:
   - --parentShutdownDuration
   - "{{ formatDuration .ProxyConfig.ParentShutdownDuration }}"
   - --discoveryAddress
+{{- if $.Values.global.csm.enabled }}
+  - {{ $.Values.global.csm.discovery.address }}
+{{- else }}
   - "{{ annotation .ObjectMeta `sidecar.istio.io/discoveryAddress` .ProxyConfig.DiscoveryAddress }}"
+{{- end }}
 {{- if eq .Values.global.proxy.tracer "lightstep" }}
   - --lightstepAddress
   - "{{ .ProxyConfig.GetTracing.GetLightstep.GetAddress }}"
@@ -198,6 +200,13 @@ containers:
   {{- if .Values.global.sds.customTokenDirectory }}
   - name: ISTIO_META_SDS_TOKEN_PATH
     value: "{{ .Values.global.sds.customTokenDirectory -}}/sdstoken"
+  {{- end }}
+  {{- if .Values.global.csm.enabled }}
+  - name: ISTIO_BOOTSTRAP
+    value: /var/lib/istio/envoy/gcp_envoy_bootstrap_tmpl.json
+  {{- /* TODO(qfel): Understand this better. Where can it be changed? */}}
+  - name: ISTIO_META_TRAFFICDIRECTOR_INTERCEPTION_PORT
+    value: "15001"
   {{- end }}
   imagePullPolicy: {{ .Values.global.imagePullPolicy }}
   {{ if ne (annotation .ObjectMeta `status.sidecar.istio.io/port` .Values.global.proxy.statusPort) `0` }}

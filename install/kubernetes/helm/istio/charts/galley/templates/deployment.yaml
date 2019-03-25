@@ -24,7 +24,7 @@ spec:
         app: {{ template "galley.name" . }}
         chart: {{ template "galley.chart" . }}
         heritage: {{ .Release.Service }}
-        release: {{ .Release.Name }}      
+        release: {{ .Release.Name }}
         istio: galley
       annotations:
         sidecar.istio.io/inject: "false"
@@ -53,7 +53,7 @@ spec:
           - --livenessProbePath=/healthliveness
           - --readinessProbePath=/healthready
           - --readinessProbeInterval=1s
-{{- if $.Values.global.controlPlaneSecurityEnabled}}
+{{- if $.Values.global.controlPlaneSecurityEnabled }}
           - --insecure=false
 {{- else }}
           - --insecure=true
@@ -67,6 +67,14 @@ spec:
 {{- if $.Values.global.logging.level }}
           - --log_output_level={{ $.Values.global.logging.level }}
 {{- end}}
+{{- if $.Values.global.csm.enabled }}
+          {{- if ne $.Values.global.csm.mcpSink.address "" }}
+          - --sinkAddress={{ $.Values.global.csm.mcpSink.address }}
+          - --sinkAuthMode=GOOGLE
+          {{- end }}
+          - --sinkMeta=project_id={{ $.Values.global.csm.projectID }},membership_name={{ $.Values.global.csm.membershipName }}
+          - --excludedResourceKinds=Pod,Node,Endpoints
+{{- end }}
           volumeMounts:
           - name: certs
             mountPath: /etc/certs
