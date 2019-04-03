@@ -25,6 +25,7 @@ import (
 	"golang.org/x/time/rate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
+	grpcMetadata "google.golang.org/grpc/metadata"
 
 	mcp "istio.io/api/mcp/v1alpha1"
 	"istio.io/pkg/ctrlz"
@@ -209,8 +210,19 @@ func newServer(a *settings.Args, p patchTable) (*Server, error) {
 		ConnRateLimiter:    mcprate.NewRateLimiter(time.Second, 100), // TODO(Nino-K): https://github.com/istio/istio/issues/12074
 	}
 
+	var m []string
+	for _, v := range a.SinkMeta {
+		kv := strings.Split(v, "=")
+		if len(kv) != 2 || kv[0] == "" || kv[1] == "" {
+			return nil, fmt.Errorf(
+				"sinkMeta not in key=value format: %v", v)
+		}
+		m = append(m, kv[0], kv[1])
+	}
+	md := grpcMetadata.Pairs(m...)
+
 	if a.SinkAddress != "" {
-		s.callOut, err = newCallout(a.SinkAddress, a.SinkAuthMode, a.SinkMeta, options)
+		s.callOut, err = newCallout(a.SinkAddress, a.SinkAuthMode, md, options)
 		if err != nil {
 			s.callOut = nil
 			scope.Fatalf("Callout could not be initialized: %v", err)
@@ -220,6 +232,7 @@ func newServer(a *settings.Args, p patchTable) (*Server, error) {
 	serverOptions := &source.ServerOptions{
 		AuthChecker: checker,
 		RateLimiter: rate.NewLimiter(rate.Every(time.Second), 100), // TODO(Nino-K): https://github.com/istio/istio/issues/12074
+		Metadata:    md,
 	}
 
 	s.mcpSource = source.NewServer(options, serverOptions)
