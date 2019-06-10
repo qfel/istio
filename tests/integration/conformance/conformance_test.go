@@ -18,12 +18,12 @@ import (
 	"fmt"
 	"testing"
 
+	"istio.io/istio/pkg/test/conformance"
+	"istio.io/istio/pkg/test/conformance/constraint"
 	"istio.io/istio/pkg/test/framework"
 	"istio.io/istio/pkg/test/framework/components/environment"
 	"istio.io/istio/pkg/test/framework/components/galley"
 	"istio.io/istio/pkg/test/framework/components/namespace"
-	"istio.io/istio/pkg/test/framework/conformance"
-	"istio.io/istio/pkg/test/framework/conformance/constraint"
 	"istio.io/istio/pkg/test/framework/label"
 )
 

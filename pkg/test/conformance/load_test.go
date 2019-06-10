@@ -22,7 +22,7 @@ import (
 
 	. "github.com/onsi/gomega"
 
-	constraint2 "istio.io/istio/pkg/test/framework/conformance/constraint"
+	"istio.io/istio/pkg/test/conformance/constraint"
 )
 
 const (
@@ -91,16 +91,16 @@ func TestBasic_NoStages(t *testing.T) {
 				{
 					Input:      input,
 					MeshConfig: &msh,
-					MCP: &constraint2.Constraints{
-						Constraints: []*constraint2.Collection{
+					MCP: &constraint.Constraints{
+						Constraints: []*constraint.Collection{
 							{
 								Name: "foo",
-								Check: []constraint2.Range{
-									&constraint2.ExactlyOne{
-										Constraints: []constraint2.Check{
-											&constraint2.Select{
+								Check: []constraint.Range{
+									&constraint.ExactlyOne{
+										Constraints: []constraint.Check{
+											&constraint.Select{
 												Expression: "foo",
-												Op:         constraint2.SelectExists,
+												Op:         constraint.SelectExists,
 											},
 										},
 									},
@@ -151,16 +151,16 @@ func TestBasic_1Stage(t *testing.T) {
 				{
 					Input:      input,
 					MeshConfig: &msh,
-					MCP: &constraint2.Constraints{
-						Constraints: []*constraint2.Collection{
+					MCP: &constraint.Constraints{
+						Constraints: []*constraint.Collection{
 							{
 								Name: "foo",
-								Check: []constraint2.Range{
-									&constraint2.ExactlyOne{
-										Constraints: []constraint2.Check{
-											&constraint2.Select{
+								Check: []constraint.Range{
+									&constraint.ExactlyOne{
+										Constraints: []constraint.Check{
+											&constraint.Select{
 												Expression: "foo",
-												Op:         constraint2.SelectExists,
+												Op:         constraint.SelectExists,
 											},
 										},
 									},
@@ -217,16 +217,16 @@ func TestBasic_2Stage(t *testing.T) {
 				{
 					Input:      input,
 					MeshConfig: &msh,
-					MCP: &constraint2.Constraints{
-						Constraints: []*constraint2.Collection{
+					MCP: &constraint.Constraints{
+						Constraints: []*constraint.Collection{
 							{
 								Name: "foo",
-								Check: []constraint2.Range{
-									&constraint2.ExactlyOne{
-										Constraints: []constraint2.Check{
-											&constraint2.Select{
+								Check: []constraint.Range{
+									&constraint.ExactlyOne{
+										Constraints: []constraint.Check{
+											&constraint.Select{
 												Expression: "foo",
-												Op:         constraint2.SelectExists,
+												Op:         constraint.SelectExists,
 											},
 										},
 									},
@@ -238,16 +238,16 @@ func TestBasic_2Stage(t *testing.T) {
 				{
 					Input:      input,
 					MeshConfig: &msh,
-					MCP: &constraint2.Constraints{
-						Constraints: []*constraint2.Collection{
+					MCP: &constraint.Constraints{
+						Constraints: []*constraint.Collection{
 							{
 								Name: "foo",
-								Check: []constraint2.Range{
-									&constraint2.ExactlyOne{
-										Constraints: []constraint2.Check{
-											&constraint2.Select{
+								Check: []constraint.Range{
+									&constraint.ExactlyOne{
+										Constraints: []constraint.Check{
+											&constraint.Select{
 												Expression: "foo",
-												Op:         constraint2.SelectExists,
+												Op:         constraint.SelectExists,
 											},
 										},
 									},

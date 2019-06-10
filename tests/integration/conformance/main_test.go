@@ -19,10 +19,10 @@ import (
 	"path"
 	"testing"
 
+	"istio.io/istio/pkg/test/conformance"
 	"istio.io/istio/pkg/test/framework"
 	"istio.io/istio/pkg/test/framework/components/environment"
 	"istio.io/istio/pkg/test/framework/components/istio"
-	"istio.io/istio/pkg/test/framework/conformance"
 )
 
 func loadCases() ([]*conformance.Test, error) {
