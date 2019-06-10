@@ -66,7 +66,7 @@ func (e *Equals) ValidateItem(i interface{}, p Params) error {
 			return err
 		}
 
-		// Run it through the standard JSON marshaller to get a well-formatted representation, suitable for comparision.
+		// Run it through the standard JSON marshaller to get a well-formatted representation, suitable for comparison.
 		mp := make(map[string]interface{})
 		if err := json.Unmarshal([]byte(s), &mp); err != nil {
 			return err

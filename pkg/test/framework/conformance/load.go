@@ -34,7 +34,7 @@ func load(dir, prefix string) ([]*Test, error) {
 	if isTest {
 		t, err := loadTest(dir, prefix)
 		if err != nil {
-			return nil, fmt.Errorf("Unable to load test: %v (dir: %q)", err, dir)
+			return nil, fmt.Errorf("unable to load test: %v (dir: %q)", err, dir)
 		}
 		return []*Test{t}, nil
 	}
@@ -109,7 +109,7 @@ func loadTest(dir, name string) (*Test, error) {
 				continue
 			}
 
-			stageId, ok := parseStageName(f.Name())
+			stageID, ok := parseStageName(f.Name())
 			if !ok {
 				continue
 			}
@@ -118,7 +118,7 @@ func loadTest(dir, name string) (*Test, error) {
 			if err != nil {
 				return nil, fmt.Errorf("error in stage %d: %v", len(stages), err)
 			}
-			stMap[stageId] = stage
+			stMap[stageID] = stage
 		}
 
 		for i := 0; i < len(stMap); i++ {
