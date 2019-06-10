@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"testing"
 
+	"istio.io/istio/pkg/test"
 	"istio.io/istio/pkg/test/conformance"
 	"istio.io/istio/pkg/test/conformance/constraint"
 	"istio.io/istio/pkg/test/framework"
@@ -119,7 +120,7 @@ func runStage(ctx framework.TestContext, gal galley.Instance, ns namespace.Insta
 	// More and different types of validations can go here
 }
 
-func validateMCPState(ctx framework.TestContext, gal galley.Instance, ns namespace.Instance, s *conformance.Stage) {
+func validateMCPState(ctx test.Failer, gal galley.Instance, ns namespace.Instance, s *conformance.Stage) {
 	p := constraint.Params{
 		Namespace: ns.Name(),
 	}
