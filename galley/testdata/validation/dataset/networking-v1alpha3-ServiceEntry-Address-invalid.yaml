@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: httpbin-a
+spec:
+  hosts:
+    - httpbin.org
+  address: 1.1.1.1 # <--- This should be addresses!
+  ports:
+    - number: 443
+      name: https
+      protocol: https
+  resolution: STATIC
+  endpoints:
+    - address: 10.10.10.10

@@ -102,7 +102,7 @@ func runCaseFn(gal galley.Instance, ca *conformance.Test) func(framework.TestCon
 	}
 }
 
-func runStage(ctx framework.TestContext, gal galley.Instance, ns namespace.Instance, s *conformance.Stage) {
+func runStage(ctx test.Failer, gal galley.Instance, ns namespace.Instance, s *conformance.Stage) {
 	if s.MeshConfig != nil {
 		gal.SetMeshConfigOrFail(ctx, *s.MeshConfig)
 	}

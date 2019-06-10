@@ -30,6 +30,7 @@
 // dataset/networking-v1alpha3-EnvoyFilter-valid.yaml
 // dataset/networking-v1alpha3-Gateway-invalid.yaml
 // dataset/networking-v1alpha3-Gateway-valid.yaml
+// dataset/networking-v1alpha3-ServiceEntry-Address-invalid.yaml
 // dataset/networking-v1alpha3-ServiceEntry-invalid.yaml
 // dataset/networking-v1alpha3-ServiceEntry-valid.yaml
 // dataset/networking-v1alpha3-Sidecar-invalid.yaml
@@ -1083,6 +1084,37 @@ func datasetNetworkingV1alpha3GatewayValidYaml() (*asset, error) {
 	return a, nil
 }
 
+var _datasetNetworkingV1alpha3ServiceentryAddressInvalidYaml = []byte(`apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: httpbin-a
+spec:
+  hosts:
+    - httpbin.org
+  address: 1.1.1.1 # <--- This should be addresses!
+  ports:
+    - number: 443
+      name: https
+      protocol: https
+  resolution: STATIC
+  endpoints:
+    - address: 10.10.10.10`)
+
+func datasetNetworkingV1alpha3ServiceentryAddressInvalidYamlBytes() ([]byte, error) {
+	return _datasetNetworkingV1alpha3ServiceentryAddressInvalidYaml, nil
+}
+
+func datasetNetworkingV1alpha3ServiceentryAddressInvalidYaml() (*asset, error) {
+	bytes, err := datasetNetworkingV1alpha3ServiceentryAddressInvalidYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "dataset/networking-v1alpha3-ServiceEntry-Address-invalid.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _datasetNetworkingV1alpha3ServiceentryInvalidYaml = []byte(`apiVersion: networking.istio.io/v1alpha3
 kind: ServiceEntry
 metadata:
@@ -1579,52 +1611,53 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"dataset/authentication-v1alpha1-MeshPolicy-invalid.yaml":  datasetAuthenticationV1alpha1MeshpolicyInvalidYaml,
-	"dataset/authentication-v1alpha1-MeshPolicy-valid.yaml":    datasetAuthenticationV1alpha1MeshpolicyValidYaml,
-	"dataset/authentication-v1alpha1-Policy-invalid.yaml":      datasetAuthenticationV1alpha1PolicyInvalidYaml,
-	"dataset/authentication-v1alpha1-Policy-valid.yaml":        datasetAuthenticationV1alpha1PolicyValidYaml,
-	"dataset/config-v1alpha2-HTTPAPISpec-invalid.yaml":         datasetConfigV1alpha2HttpapispecInvalidYaml,
-	"dataset/config-v1alpha2-HTTPAPISpec-valid.yaml":           datasetConfigV1alpha2HttpapispecValidYaml,
-	"dataset/config-v1alpha2-HTTPAPISpecBinding-invalid.yaml":  datasetConfigV1alpha2HttpapispecbindingInvalidYaml,
-	"dataset/config-v1alpha2-HTTPAPISpecBinding-valid.yaml":    datasetConfigV1alpha2HttpapispecbindingValidYaml,
-	"dataset/config-v1alpha2-QuotaSpec-invalid.yaml":           datasetConfigV1alpha2QuotaspecInvalidYaml,
-	"dataset/config-v1alpha2-QuotaSpec-valid.yaml":             datasetConfigV1alpha2QuotaspecValidYaml,
-	"dataset/config-v1alpha2-QuotaSpecBinding-invalid.yaml":    datasetConfigV1alpha2QuotaspecbindingInvalidYaml,
-	"dataset/config-v1alpha2-QuotaSpecBinding-valid.yaml":      datasetConfigV1alpha2QuotaspecbindingValidYaml,
-	"dataset/config-v1alpha2-adapter-invalid.yaml":             datasetConfigV1alpha2AdapterInvalidYaml,
-	"dataset/config-v1alpha2-adapter-valid.yaml":               datasetConfigV1alpha2AdapterValidYaml,
-	"dataset/config-v1alpha2-attributemanifest-invalid.yaml":   datasetConfigV1alpha2AttributemanifestInvalidYaml,
-	"dataset/config-v1alpha2-attributemanifest-valid.yaml":     datasetConfigV1alpha2AttributemanifestValidYaml,
-	"dataset/config-v1alpha2-handler-invalid.yaml":             datasetConfigV1alpha2HandlerInvalidYaml,
-	"dataset/config-v1alpha2-handler-valid.yaml":               datasetConfigV1alpha2HandlerValidYaml,
-	"dataset/config-v1alpha2-instance-invalid.yaml":            datasetConfigV1alpha2InstanceInvalidYaml,
-	"dataset/config-v1alpha2-instance-valid.yaml":              datasetConfigV1alpha2InstanceValidYaml,
-	"dataset/config-v1alpha2-rule-invalid.yaml":                datasetConfigV1alpha2RuleInvalidYaml,
-	"dataset/config-v1alpha2-rule-valid.yaml":                  datasetConfigV1alpha2RuleValidYaml,
-	"dataset/config-v1alpha2-template-invalid.yaml":            datasetConfigV1alpha2TemplateInvalidYaml,
-	"dataset/config-v1alpha2-template-valid.yaml":              datasetConfigV1alpha2TemplateValidYaml,
-	"dataset/networking-v1alpha3-DestinationRule-invalid.yaml": datasetNetworkingV1alpha3DestinationruleInvalidYaml,
-	"dataset/networking-v1alpha3-DestinationRule-valid.yaml":   datasetNetworkingV1alpha3DestinationruleValidYaml,
-	"dataset/networking-v1alpha3-EnvoyFilter-invalid.yaml":     datasetNetworkingV1alpha3EnvoyfilterInvalidYaml,
-	"dataset/networking-v1alpha3-EnvoyFilter-valid.yaml":       datasetNetworkingV1alpha3EnvoyfilterValidYaml,
-	"dataset/networking-v1alpha3-Gateway-invalid.yaml":         datasetNetworkingV1alpha3GatewayInvalidYaml,
-	"dataset/networking-v1alpha3-Gateway-valid.yaml":           datasetNetworkingV1alpha3GatewayValidYaml,
-	"dataset/networking-v1alpha3-ServiceEntry-invalid.yaml":    datasetNetworkingV1alpha3ServiceentryInvalidYaml,
-	"dataset/networking-v1alpha3-ServiceEntry-valid.yaml":      datasetNetworkingV1alpha3ServiceentryValidYaml,
-	"dataset/networking-v1alpha3-Sidecar-invalid.yaml":         datasetNetworkingV1alpha3SidecarInvalidYaml,
-	"dataset/networking-v1alpha3-Sidecar-valid.yaml":           datasetNetworkingV1alpha3SidecarValidYaml,
-	"dataset/networking-v1alpha3-VirtualService-invalid.yaml":  datasetNetworkingV1alpha3VirtualserviceInvalidYaml,
-	"dataset/networking-v1alpha3-VirtualService-valid.yaml":    datasetNetworkingV1alpha3VirtualserviceValidYaml,
-	"dataset/rbac-v1alpha1-AuthorizationPolicy-invalid.yaml":   datasetRbacV1alpha1AuthorizationpolicyInvalidYaml,
-	"dataset/rbac-v1alpha1-AuthorizationPolicy-valid.yaml":     datasetRbacV1alpha1AuthorizationpolicyValidYaml,
-	"dataset/rbac-v1alpha1-ClusterRbacConfig-invalid.yaml":     datasetRbacV1alpha1ClusterrbacconfigInvalidYaml,
-	"dataset/rbac-v1alpha1-ClusterRbacConfig-valid.yaml":       datasetRbacV1alpha1ClusterrbacconfigValidYaml,
-	"dataset/rbac-v1alpha1-RBacConfig-invalid.yaml":            datasetRbacV1alpha1RbacconfigInvalidYaml,
-	"dataset/rbac-v1alpha1-RBacConfig-valid.yaml":              datasetRbacV1alpha1RbacconfigValidYaml,
-	"dataset/rbac-v1alpha1-ServiceRole-invalid.yaml":           datasetRbacV1alpha1ServiceroleInvalidYaml,
-	"dataset/rbac-v1alpha1-ServiceRole-valid.yaml":             datasetRbacV1alpha1ServiceroleValidYaml,
-	"dataset/rbac-v1alpha1-ServiceRoleBinding-invalid.yaml":    datasetRbacV1alpha1ServicerolebindingInvalidYaml,
-	"dataset/rbac-v1alpha1-ServiceRoleBinding-valid.yaml":      datasetRbacV1alpha1ServicerolebindingValidYaml,
+	"dataset/authentication-v1alpha1-MeshPolicy-invalid.yaml":       datasetAuthenticationV1alpha1MeshpolicyInvalidYaml,
+	"dataset/authentication-v1alpha1-MeshPolicy-valid.yaml":         datasetAuthenticationV1alpha1MeshpolicyValidYaml,
+	"dataset/authentication-v1alpha1-Policy-invalid.yaml":           datasetAuthenticationV1alpha1PolicyInvalidYaml,
+	"dataset/authentication-v1alpha1-Policy-valid.yaml":             datasetAuthenticationV1alpha1PolicyValidYaml,
+	"dataset/config-v1alpha2-HTTPAPISpec-invalid.yaml":              datasetConfigV1alpha2HttpapispecInvalidYaml,
+	"dataset/config-v1alpha2-HTTPAPISpec-valid.yaml":                datasetConfigV1alpha2HttpapispecValidYaml,
+	"dataset/config-v1alpha2-HTTPAPISpecBinding-invalid.yaml":       datasetConfigV1alpha2HttpapispecbindingInvalidYaml,
+	"dataset/config-v1alpha2-HTTPAPISpecBinding-valid.yaml":         datasetConfigV1alpha2HttpapispecbindingValidYaml,
+	"dataset/config-v1alpha2-QuotaSpec-invalid.yaml":                datasetConfigV1alpha2QuotaspecInvalidYaml,
+	"dataset/config-v1alpha2-QuotaSpec-valid.yaml":                  datasetConfigV1alpha2QuotaspecValidYaml,
+	"dataset/config-v1alpha2-QuotaSpecBinding-invalid.yaml":         datasetConfigV1alpha2QuotaspecbindingInvalidYaml,
+	"dataset/config-v1alpha2-QuotaSpecBinding-valid.yaml":           datasetConfigV1alpha2QuotaspecbindingValidYaml,
+	"dataset/config-v1alpha2-adapter-invalid.yaml":                  datasetConfigV1alpha2AdapterInvalidYaml,
+	"dataset/config-v1alpha2-adapter-valid.yaml":                    datasetConfigV1alpha2AdapterValidYaml,
+	"dataset/config-v1alpha2-attributemanifest-invalid.yaml":        datasetConfigV1alpha2AttributemanifestInvalidYaml,
+	"dataset/config-v1alpha2-attributemanifest-valid.yaml":          datasetConfigV1alpha2AttributemanifestValidYaml,
+	"dataset/config-v1alpha2-handler-invalid.yaml":                  datasetConfigV1alpha2HandlerInvalidYaml,
+	"dataset/config-v1alpha2-handler-valid.yaml":                    datasetConfigV1alpha2HandlerValidYaml,
+	"dataset/config-v1alpha2-instance-invalid.yaml":                 datasetConfigV1alpha2InstanceInvalidYaml,
+	"dataset/config-v1alpha2-instance-valid.yaml":                   datasetConfigV1alpha2InstanceValidYaml,
+	"dataset/config-v1alpha2-rule-invalid.yaml":                     datasetConfigV1alpha2RuleInvalidYaml,
+	"dataset/config-v1alpha2-rule-valid.yaml":                       datasetConfigV1alpha2RuleValidYaml,
+	"dataset/config-v1alpha2-template-invalid.yaml":                 datasetConfigV1alpha2TemplateInvalidYaml,
+	"dataset/config-v1alpha2-template-valid.yaml":                   datasetConfigV1alpha2TemplateValidYaml,
+	"dataset/networking-v1alpha3-DestinationRule-invalid.yaml":      datasetNetworkingV1alpha3DestinationruleInvalidYaml,
+	"dataset/networking-v1alpha3-DestinationRule-valid.yaml":        datasetNetworkingV1alpha3DestinationruleValidYaml,
+	"dataset/networking-v1alpha3-EnvoyFilter-invalid.yaml":          datasetNetworkingV1alpha3EnvoyfilterInvalidYaml,
+	"dataset/networking-v1alpha3-EnvoyFilter-valid.yaml":            datasetNetworkingV1alpha3EnvoyfilterValidYaml,
+	"dataset/networking-v1alpha3-Gateway-invalid.yaml":              datasetNetworkingV1alpha3GatewayInvalidYaml,
+	"dataset/networking-v1alpha3-Gateway-valid.yaml":                datasetNetworkingV1alpha3GatewayValidYaml,
+	"dataset/networking-v1alpha3-ServiceEntry-Address-invalid.yaml": datasetNetworkingV1alpha3ServiceentryAddressInvalidYaml,
+	"dataset/networking-v1alpha3-ServiceEntry-invalid.yaml":         datasetNetworkingV1alpha3ServiceentryInvalidYaml,
+	"dataset/networking-v1alpha3-ServiceEntry-valid.yaml":           datasetNetworkingV1alpha3ServiceentryValidYaml,
+	"dataset/networking-v1alpha3-Sidecar-invalid.yaml":              datasetNetworkingV1alpha3SidecarInvalidYaml,
+	"dataset/networking-v1alpha3-Sidecar-valid.yaml":                datasetNetworkingV1alpha3SidecarValidYaml,
+	"dataset/networking-v1alpha3-VirtualService-invalid.yaml":       datasetNetworkingV1alpha3VirtualserviceInvalidYaml,
+	"dataset/networking-v1alpha3-VirtualService-valid.yaml":         datasetNetworkingV1alpha3VirtualserviceValidYaml,
+	"dataset/rbac-v1alpha1-AuthorizationPolicy-invalid.yaml":        datasetRbacV1alpha1AuthorizationpolicyInvalidYaml,
+	"dataset/rbac-v1alpha1-AuthorizationPolicy-valid.yaml":          datasetRbacV1alpha1AuthorizationpolicyValidYaml,
+	"dataset/rbac-v1alpha1-ClusterRbacConfig-invalid.yaml":          datasetRbacV1alpha1ClusterrbacconfigInvalidYaml,
+	"dataset/rbac-v1alpha1-ClusterRbacConfig-valid.yaml":            datasetRbacV1alpha1ClusterrbacconfigValidYaml,
+	"dataset/rbac-v1alpha1-RBacConfig-invalid.yaml":                 datasetRbacV1alpha1RbacconfigInvalidYaml,
+	"dataset/rbac-v1alpha1-RBacConfig-valid.yaml":                   datasetRbacV1alpha1RbacconfigValidYaml,
+	"dataset/rbac-v1alpha1-ServiceRole-invalid.yaml":                datasetRbacV1alpha1ServiceroleInvalidYaml,
+	"dataset/rbac-v1alpha1-ServiceRole-valid.yaml":                  datasetRbacV1alpha1ServiceroleValidYaml,
+	"dataset/rbac-v1alpha1-ServiceRoleBinding-invalid.yaml":         datasetRbacV1alpha1ServicerolebindingInvalidYaml,
+	"dataset/rbac-v1alpha1-ServiceRoleBinding-valid.yaml":           datasetRbacV1alpha1ServicerolebindingValidYaml,
 }
 
 // AssetDir returns the file names below a certain
@@ -1669,52 +1702,53 @@ type bintree struct {
 
 var _bintree = &bintree{nil, map[string]*bintree{
 	"dataset": &bintree{nil, map[string]*bintree{
-		"authentication-v1alpha1-MeshPolicy-invalid.yaml":  &bintree{datasetAuthenticationV1alpha1MeshpolicyInvalidYaml, map[string]*bintree{}},
-		"authentication-v1alpha1-MeshPolicy-valid.yaml":    &bintree{datasetAuthenticationV1alpha1MeshpolicyValidYaml, map[string]*bintree{}},
-		"authentication-v1alpha1-Policy-invalid.yaml":      &bintree{datasetAuthenticationV1alpha1PolicyInvalidYaml, map[string]*bintree{}},
-		"authentication-v1alpha1-Policy-valid.yaml":        &bintree{datasetAuthenticationV1alpha1PolicyValidYaml, map[string]*bintree{}},
-		"config-v1alpha2-HTTPAPISpec-invalid.yaml":         &bintree{datasetConfigV1alpha2HttpapispecInvalidYaml, map[string]*bintree{}},
-		"config-v1alpha2-HTTPAPISpec-valid.yaml":           &bintree{datasetConfigV1alpha2HttpapispecValidYaml, map[string]*bintree{}},
-		"config-v1alpha2-HTTPAPISpecBinding-invalid.yaml":  &bintree{datasetConfigV1alpha2HttpapispecbindingInvalidYaml, map[string]*bintree{}},
-		"config-v1alpha2-HTTPAPISpecBinding-valid.yaml":    &bintree{datasetConfigV1alpha2HttpapispecbindingValidYaml, map[string]*bintree{}},
-		"config-v1alpha2-QuotaSpec-invalid.yaml":           &bintree{datasetConfigV1alpha2QuotaspecInvalidYaml, map[string]*bintree{}},
-		"config-v1alpha2-QuotaSpec-valid.yaml":             &bintree{datasetConfigV1alpha2QuotaspecValidYaml, map[string]*bintree{}},
-		"config-v1alpha2-QuotaSpecBinding-invalid.yaml":    &bintree{datasetConfigV1alpha2QuotaspecbindingInvalidYaml, map[string]*bintree{}},
-		"config-v1alpha2-QuotaSpecBinding-valid.yaml":      &bintree{datasetConfigV1alpha2QuotaspecbindingValidYaml, map[string]*bintree{}},
-		"config-v1alpha2-adapter-invalid.yaml":             &bintree{datasetConfigV1alpha2AdapterInvalidYaml, map[string]*bintree{}},
-		"config-v1alpha2-adapter-valid.yaml":               &bintree{datasetConfigV1alpha2AdapterValidYaml, map[string]*bintree{}},
-		"config-v1alpha2-attributemanifest-invalid.yaml":   &bintree{datasetConfigV1alpha2AttributemanifestInvalidYaml, map[string]*bintree{}},
-		"config-v1alpha2-attributemanifest-valid.yaml":     &bintree{datasetConfigV1alpha2AttributemanifestValidYaml, map[string]*bintree{}},
-		"config-v1alpha2-handler-invalid.yaml":             &bintree{datasetConfigV1alpha2HandlerInvalidYaml, map[string]*bintree{}},
-		"config-v1alpha2-handler-valid.yaml":               &bintree{datasetConfigV1alpha2HandlerValidYaml, map[string]*bintree{}},
-		"config-v1alpha2-instance-invalid.yaml":            &bintree{datasetConfigV1alpha2InstanceInvalidYaml, map[string]*bintree{}},
-		"config-v1alpha2-instance-valid.yaml":              &bintree{datasetConfigV1alpha2InstanceValidYaml, map[string]*bintree{}},
-		"config-v1alpha2-rule-invalid.yaml":                &bintree{datasetConfigV1alpha2RuleInvalidYaml, map[string]*bintree{}},
-		"config-v1alpha2-rule-valid.yaml":                  &bintree{datasetConfigV1alpha2RuleValidYaml, map[string]*bintree{}},
-		"config-v1alpha2-template-invalid.yaml":            &bintree{datasetConfigV1alpha2TemplateInvalidYaml, map[string]*bintree{}},
-		"config-v1alpha2-template-valid.yaml":              &bintree{datasetConfigV1alpha2TemplateValidYaml, map[string]*bintree{}},
-		"networking-v1alpha3-DestinationRule-invalid.yaml": &bintree{datasetNetworkingV1alpha3DestinationruleInvalidYaml, map[string]*bintree{}},
-		"networking-v1alpha3-DestinationRule-valid.yaml":   &bintree{datasetNetworkingV1alpha3DestinationruleValidYaml, map[string]*bintree{}},
-		"networking-v1alpha3-EnvoyFilter-invalid.yaml":     &bintree{datasetNetworkingV1alpha3EnvoyfilterInvalidYaml, map[string]*bintree{}},
-		"networking-v1alpha3-EnvoyFilter-valid.yaml":       &bintree{datasetNetworkingV1alpha3EnvoyfilterValidYaml, map[string]*bintree{}},
-		"networking-v1alpha3-Gateway-invalid.yaml":         &bintree{datasetNetworkingV1alpha3GatewayInvalidYaml, map[string]*bintree{}},
-		"networking-v1alpha3-Gateway-valid.yaml":           &bintree{datasetNetworkingV1alpha3GatewayValidYaml, map[string]*bintree{}},
-		"networking-v1alpha3-ServiceEntry-invalid.yaml":    &bintree{datasetNetworkingV1alpha3ServiceentryInvalidYaml, map[string]*bintree{}},
-		"networking-v1alpha3-ServiceEntry-valid.yaml":      &bintree{datasetNetworkingV1alpha3ServiceentryValidYaml, map[string]*bintree{}},
-		"networking-v1alpha3-Sidecar-invalid.yaml":         &bintree{datasetNetworkingV1alpha3SidecarInvalidYaml, map[string]*bintree{}},
-		"networking-v1alpha3-Sidecar-valid.yaml":           &bintree{datasetNetworkingV1alpha3SidecarValidYaml, map[string]*bintree{}},
-		"networking-v1alpha3-VirtualService-invalid.yaml":  &bintree{datasetNetworkingV1alpha3VirtualserviceInvalidYaml, map[string]*bintree{}},
-		"networking-v1alpha3-VirtualService-valid.yaml":    &bintree{datasetNetworkingV1alpha3VirtualserviceValidYaml, map[string]*bintree{}},
-		"rbac-v1alpha1-AuthorizationPolicy-invalid.yaml":   &bintree{datasetRbacV1alpha1AuthorizationpolicyInvalidYaml, map[string]*bintree{}},
-		"rbac-v1alpha1-AuthorizationPolicy-valid.yaml":     &bintree{datasetRbacV1alpha1AuthorizationpolicyValidYaml, map[string]*bintree{}},
-		"rbac-v1alpha1-ClusterRbacConfig-invalid.yaml":     &bintree{datasetRbacV1alpha1ClusterrbacconfigInvalidYaml, map[string]*bintree{}},
-		"rbac-v1alpha1-ClusterRbacConfig-valid.yaml":       &bintree{datasetRbacV1alpha1ClusterrbacconfigValidYaml, map[string]*bintree{}},
-		"rbac-v1alpha1-RBacConfig-invalid.yaml":            &bintree{datasetRbacV1alpha1RbacconfigInvalidYaml, map[string]*bintree{}},
-		"rbac-v1alpha1-RBacConfig-valid.yaml":              &bintree{datasetRbacV1alpha1RbacconfigValidYaml, map[string]*bintree{}},
-		"rbac-v1alpha1-ServiceRole-invalid.yaml":           &bintree{datasetRbacV1alpha1ServiceroleInvalidYaml, map[string]*bintree{}},
-		"rbac-v1alpha1-ServiceRole-valid.yaml":             &bintree{datasetRbacV1alpha1ServiceroleValidYaml, map[string]*bintree{}},
-		"rbac-v1alpha1-ServiceRoleBinding-invalid.yaml":    &bintree{datasetRbacV1alpha1ServicerolebindingInvalidYaml, map[string]*bintree{}},
-		"rbac-v1alpha1-ServiceRoleBinding-valid.yaml":      &bintree{datasetRbacV1alpha1ServicerolebindingValidYaml, map[string]*bintree{}},
+		"authentication-v1alpha1-MeshPolicy-invalid.yaml":       &bintree{datasetAuthenticationV1alpha1MeshpolicyInvalidYaml, map[string]*bintree{}},
+		"authentication-v1alpha1-MeshPolicy-valid.yaml":         &bintree{datasetAuthenticationV1alpha1MeshpolicyValidYaml, map[string]*bintree{}},
+		"authentication-v1alpha1-Policy-invalid.yaml":           &bintree{datasetAuthenticationV1alpha1PolicyInvalidYaml, map[string]*bintree{}},
+		"authentication-v1alpha1-Policy-valid.yaml":             &bintree{datasetAuthenticationV1alpha1PolicyValidYaml, map[string]*bintree{}},
+		"config-v1alpha2-HTTPAPISpec-invalid.yaml":              &bintree{datasetConfigV1alpha2HttpapispecInvalidYaml, map[string]*bintree{}},
+		"config-v1alpha2-HTTPAPISpec-valid.yaml":                &bintree{datasetConfigV1alpha2HttpapispecValidYaml, map[string]*bintree{}},
+		"config-v1alpha2-HTTPAPISpecBinding-invalid.yaml":       &bintree{datasetConfigV1alpha2HttpapispecbindingInvalidYaml, map[string]*bintree{}},
+		"config-v1alpha2-HTTPAPISpecBinding-valid.yaml":         &bintree{datasetConfigV1alpha2HttpapispecbindingValidYaml, map[string]*bintree{}},
+		"config-v1alpha2-QuotaSpec-invalid.yaml":                &bintree{datasetConfigV1alpha2QuotaspecInvalidYaml, map[string]*bintree{}},
+		"config-v1alpha2-QuotaSpec-valid.yaml":                  &bintree{datasetConfigV1alpha2QuotaspecValidYaml, map[string]*bintree{}},
+		"config-v1alpha2-QuotaSpecBinding-invalid.yaml":         &bintree{datasetConfigV1alpha2QuotaspecbindingInvalidYaml, map[string]*bintree{}},
+		"config-v1alpha2-QuotaSpecBinding-valid.yaml":           &bintree{datasetConfigV1alpha2QuotaspecbindingValidYaml, map[string]*bintree{}},
+		"config-v1alpha2-adapter-invalid.yaml":                  &bintree{datasetConfigV1alpha2AdapterInvalidYaml, map[string]*bintree{}},
+		"config-v1alpha2-adapter-valid.yaml":                    &bintree{datasetConfigV1alpha2AdapterValidYaml, map[string]*bintree{}},
+		"config-v1alpha2-attributemanifest-invalid.yaml":        &bintree{datasetConfigV1alpha2AttributemanifestInvalidYaml, map[string]*bintree{}},
+		"config-v1alpha2-attributemanifest-valid.yaml":          &bintree{datasetConfigV1alpha2AttributemanifestValidYaml, map[string]*bintree{}},
+		"config-v1alpha2-handler-invalid.yaml":                  &bintree{datasetConfigV1alpha2HandlerInvalidYaml, map[string]*bintree{}},
+		"config-v1alpha2-handler-valid.yaml":                    &bintree{datasetConfigV1alpha2HandlerValidYaml, map[string]*bintree{}},
+		"config-v1alpha2-instance-invalid.yaml":                 &bintree{datasetConfigV1alpha2InstanceInvalidYaml, map[string]*bintree{}},
+		"config-v1alpha2-instance-valid.yaml":                   &bintree{datasetConfigV1alpha2InstanceValidYaml, map[string]*bintree{}},
+		"config-v1alpha2-rule-invalid.yaml":                     &bintree{datasetConfigV1alpha2RuleInvalidYaml, map[string]*bintree{}},
+		"config-v1alpha2-rule-valid.yaml":                       &bintree{datasetConfigV1alpha2RuleValidYaml, map[string]*bintree{}},
+		"config-v1alpha2-template-invalid.yaml":                 &bintree{datasetConfigV1alpha2TemplateInvalidYaml, map[string]*bintree{}},
+		"config-v1alpha2-template-valid.yaml":                   &bintree{datasetConfigV1alpha2TemplateValidYaml, map[string]*bintree{}},
+		"networking-v1alpha3-DestinationRule-invalid.yaml":      &bintree{datasetNetworkingV1alpha3DestinationruleInvalidYaml, map[string]*bintree{}},
+		"networking-v1alpha3-DestinationRule-valid.yaml":        &bintree{datasetNetworkingV1alpha3DestinationruleValidYaml, map[string]*bintree{}},
+		"networking-v1alpha3-EnvoyFilter-invalid.yaml":          &bintree{datasetNetworkingV1alpha3EnvoyfilterInvalidYaml, map[string]*bintree{}},
+		"networking-v1alpha3-EnvoyFilter-valid.yaml":            &bintree{datasetNetworkingV1alpha3EnvoyfilterValidYaml, map[string]*bintree{}},
+		"networking-v1alpha3-Gateway-invalid.yaml":              &bintree{datasetNetworkingV1alpha3GatewayInvalidYaml, map[string]*bintree{}},
+		"networking-v1alpha3-Gateway-valid.yaml":                &bintree{datasetNetworkingV1alpha3GatewayValidYaml, map[string]*bintree{}},
+		"networking-v1alpha3-ServiceEntry-Address-invalid.yaml": &bintree{datasetNetworkingV1alpha3ServiceentryAddressInvalidYaml, map[string]*bintree{}},
+		"networking-v1alpha3-ServiceEntry-invalid.yaml":         &bintree{datasetNetworkingV1alpha3ServiceentryInvalidYaml, map[string]*bintree{}},
+		"networking-v1alpha3-ServiceEntry-valid.yaml":           &bintree{datasetNetworkingV1alpha3ServiceentryValidYaml, map[string]*bintree{}},
+		"networking-v1alpha3-Sidecar-invalid.yaml":              &bintree{datasetNetworkingV1alpha3SidecarInvalidYaml, map[string]*bintree{}},
+		"networking-v1alpha3-Sidecar-valid.yaml":                &bintree{datasetNetworkingV1alpha3SidecarValidYaml, map[string]*bintree{}},
+		"networking-v1alpha3-VirtualService-invalid.yaml":       &bintree{datasetNetworkingV1alpha3VirtualserviceInvalidYaml, map[string]*bintree{}},
+		"networking-v1alpha3-VirtualService-valid.yaml":         &bintree{datasetNetworkingV1alpha3VirtualserviceValidYaml, map[string]*bintree{}},
+		"rbac-v1alpha1-AuthorizationPolicy-invalid.yaml":        &bintree{datasetRbacV1alpha1AuthorizationpolicyInvalidYaml, map[string]*bintree{}},
+		"rbac-v1alpha1-AuthorizationPolicy-valid.yaml":          &bintree{datasetRbacV1alpha1AuthorizationpolicyValidYaml, map[string]*bintree{}},
+		"rbac-v1alpha1-ClusterRbacConfig-invalid.yaml":          &bintree{datasetRbacV1alpha1ClusterrbacconfigInvalidYaml, map[string]*bintree{}},
+		"rbac-v1alpha1-ClusterRbacConfig-valid.yaml":            &bintree{datasetRbacV1alpha1ClusterrbacconfigValidYaml, map[string]*bintree{}},
+		"rbac-v1alpha1-RBacConfig-invalid.yaml":                 &bintree{datasetRbacV1alpha1RbacconfigInvalidYaml, map[string]*bintree{}},
+		"rbac-v1alpha1-RBacConfig-valid.yaml":                   &bintree{datasetRbacV1alpha1RbacconfigValidYaml, map[string]*bintree{}},
+		"rbac-v1alpha1-ServiceRole-invalid.yaml":                &bintree{datasetRbacV1alpha1ServiceroleInvalidYaml, map[string]*bintree{}},
+		"rbac-v1alpha1-ServiceRole-valid.yaml":                  &bintree{datasetRbacV1alpha1ServiceroleValidYaml, map[string]*bintree{}},
+		"rbac-v1alpha1-ServiceRoleBinding-invalid.yaml":         &bintree{datasetRbacV1alpha1ServicerolebindingInvalidYaml, map[string]*bintree{}},
+		"rbac-v1alpha1-ServiceRoleBinding-valid.yaml":           &bintree{datasetRbacV1alpha1ServicerolebindingValidYaml, map[string]*bintree{}},
 	}},
 }}
 
