@@ -97,6 +97,15 @@ func (s *sidecar) InfoOrFail(t test.Failer) *envoyAdmin.ServerInfo {
 	return info
 }
 
+func (s *sidecar) Clusters() (*envoyAdmin.Clusters, error) {
+	msg := &envoyAdmin.Clusters{}
+	if err := s.adminRequest("clusters?format=json", msg); err != nil {
+		return nil, err
+	}
+
+	return msg, nil
+}
+
 func (s *sidecar) Config() (*envoyAdmin.ConfigDump, error) {
 	msg := &envoyAdmin.ConfigDump{}
 	if err := s.adminRequest("config_dump", msg); err != nil {

@@ -82,7 +82,7 @@ static_resources:
     hosts:
     - socket_address:
         address: 127.0.0.1
-        port_value: {{$p.InstancePort}}    
+        port_value: {{$p.InstancePort}}
   {{ end -}}
   listeners:
   {{- range $i, $p := .Ports }}
@@ -246,6 +246,10 @@ func (s *sidecar) ConfigOrFail(t test.Failer) *envoyAdmin.ConfigDump {
 		t.Fatal(err)
 	}
 	return cfg
+}
+
+func (s *sidecar) Clusters() (*envoyAdmin.Clusters, error) {
+	return envoy.GetClusters(s.adminPort)
 }
 
 func (s *sidecar) WaitForConfig(accept func(*envoyAdmin.ConfigDump) (bool, error), options ...retry.Option) error {

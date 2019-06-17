@@ -116,6 +116,8 @@ type Sidecar interface {
 	Config() (*envoyAdmin.ConfigDump, error)
 	ConfigOrFail(t test.Failer) *envoyAdmin.ConfigDump
 
+	Clusters() (*envoyAdmin.Clusters, error)
+
 	// WaitForConfig queries the Envoy configuration an executes the given accept handler. If the
 	// response is not accepted, the request will be retried until either a timeout or a response
 	// has been accepted.

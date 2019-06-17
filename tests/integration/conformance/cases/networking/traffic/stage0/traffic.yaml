@@ -1,0 +1,36 @@
+services:
+- name: echo
+  ports:
+  - name: http
+    serviceport: 8080
+    protocol: HTTP
+- name: echo1
+  ports:
+  - name: http
+    serviceport: 8080
+    protocol: HTTP
+- name: echo2
+  ports:
+  - name: http
+    serviceport: 8080
+    protocol: HTTP
+
+calls:
+- caller: echo
+  callee: echo1
+  host: dispatch
+  path: /echo1
+
+- caller: echo
+  callee: echo1
+  host: dispatch
+  path: /echo2
+
+- caller: echo
+  callee: echo1
+  host: dispatch
+  path: /whatever
+
+- caller: echo
+  callee: echo1
+  path: /whatever

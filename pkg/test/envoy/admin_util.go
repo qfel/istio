@@ -89,6 +89,20 @@ func GetConfigDump(adminPort int) (*envoyAdmin.ConfigDump, error) {
 	return msg, nil
 }
 
+// GetClusters polls Envoy admin port for the config dump and returns the response.
+func GetClusters(adminPort int) (*envoyAdmin.Clusters, error) {
+	buffer, err := doEnvoyGet("clusters?format=json", adminPort)
+	if err != nil {
+		return nil, err
+	}
+
+	msg := &envoyAdmin.Clusters{}
+	if err := jsonpb.Unmarshal(buffer, msg); err != nil {
+		return nil, err
+	}
+	return msg, nil
+}
+
 func doEnvoyGet(path string, adminPort int) (*bytes.Buffer, error) {
 	requestURL := fmt.Sprintf("http://127.0.0.1:%d/%s", adminPort, path)
 	buffer, err := doHTTPGet(requestURL)

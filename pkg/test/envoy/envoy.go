@@ -193,6 +193,9 @@ func isEnvoyBinary(f os.FileInfo) bool {
 func findEnvoyBinaries() ([]string, error) {
 	binPaths := make([]string, 0)
 	err := filepath.Walk(env.IstioOut, func(path string, f os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if isEnvoyBinary(f) {
 			binPaths = append(binPaths, path)
 		}

@@ -22,7 +22,9 @@ import (
 	"strconv"
 	"strings"
 
+	"gopkg.in/yaml.v2"
 	"istio.io/istio/pkg/test/conformance/constraint"
+	"istio.io/istio/pkg/test/framework/components/echo"
 )
 
 const (
@@ -34,7 +36,28 @@ const (
 
 	// MCPFileName is the name of the MCP constraint file.
 	MCPFileName = "mcp.yaml"
+
+	TrafficFileName = "traffic.yaml"
 )
+
+type Traffic struct {
+	Services []Service
+	Calls    []Call
+}
+
+type Service struct {
+	Name  string
+	Ports []echo.Port
+}
+
+type Call struct {
+	Caller, Callee string
+	Host           string
+	Port           uint16
+	Path           string
+	Count          int
+	Response       *constraint.Constraints
+}
 
 // Stage of a test.
 type Stage struct {
@@ -46,6 +69,8 @@ type Stage struct {
 
 	// MeshConfig (if any) to apply for this stage.
 	MeshConfig *string
+
+	Traffic *Traffic
 }
 
 func hasStages(dir string) (bool, error) {
@@ -96,10 +121,23 @@ func loadStage(dir string) (*Stage, error) {
 		}
 	}
 
+	var traffic *Traffic
+	switch bs, err := ioutil.ReadFile(path.Join(dir, TrafficFileName)); {
+	case err == nil:
+		traffic = new(Traffic)
+		if err := yaml.UnmarshalStrict(bs, traffic); err != nil {
+			return nil, err
+		}
+	case os.IsNotExist(err):
+	default:
+		return nil, err
+	}
+
 	return &Stage{
 		Input:      string(input),
 		MeshConfig: meshconfig,
 		MCP:        mcp,
+		Traffic:    traffic,
 	}, nil
 }
 

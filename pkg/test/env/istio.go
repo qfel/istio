@@ -15,10 +15,12 @@
 package env
 
 import (
+	"errors"
 	"fmt"
 	"go/build"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"runtime"
@@ -27,10 +29,6 @@ import (
 )
 
 var (
-	// GOPATH environment variable
-	// nolint: golint
-	GOPATH Variable = "GOPATH"
-
 	// TOP environment variable
 	// nolint: golint
 	TOP Variable = "TOP"
@@ -79,7 +77,7 @@ var (
 	// TODO: Some of these values are overlapping. We should re-align them.
 
 	// IstioRoot is the root of the Istio source repository.
-	IstioRoot = path.Join(GOPATH.Value(), "/src/istio.io/istio")
+	IstioRoot = getIstioRoot()
 
 	// ChartsDir is the Kubernetes Helm chart directory in the repository
 	ChartsDir = path.Join(IstioRoot, "install/kubernetes/helm")
@@ -112,12 +110,63 @@ func getDefaultIstioTop() string {
 	return current // launching from GOTOP (for example in goland)
 }
 
+func moduleRoot(dir string) (string, error) {
+	for {
+		switch _, err := os.Stat(filepath.Join(dir, "go.mod")); true {
+		case os.IsNotExist(err):
+			parent := filepath.Dir(dir)
+			if parent == dir {
+				return "", errors.New("not a Go module")
+			}
+			dir = parent
+		case err != nil:
+			return "", err
+		default:
+			return dir, nil
+		}
+	}
+}
+
+func gopathOrIstioTop() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	if insideGoPath(dir) {
+		return build.Default.GOPATH
+	}
+	dir, err = moduleRoot(dir)
+	if err != nil {
+		panic(err)
+	}
+	return dir
+}
+
 func getDefaultIstioBin() string {
-	return fmt.Sprintf("%s/bin", build.Default.GOPATH)
+	return filepath.Join(gopathOrIstioTop(), "bin")
 }
 
 func getDefaultIstioOut() string {
-	return fmt.Sprintf("%s/out/%s_%s", build.Default.GOPATH, runtime.GOOS, runtime.GOARCH)
+	return filepath.Join(gopathOrIstioTop(), "out", fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH))
+}
+
+func insideGoPath(dir string) bool {
+	return strings.HasPrefix(dir+string(filepath.Separator), build.Default.GOPATH+string(filepath.Separator))
+}
+
+func getIstioRoot() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	if insideGoPath(dir) {
+		return filepath.Join(build.Default.GOPATH, "src", "istio.io", "istio")
+	}
+	dir, err = moduleRoot(dir)
+	if err != nil {
+		panic(err)
+	}
+	return dir
 }
 
 func verifyFile(v Variable, f string) string {

@@ -16,16 +16,25 @@ package conformance
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
 	"testing"
 
 	"istio.io/istio/pkg/test"
 	"istio.io/istio/pkg/test/conformance"
 	"istio.io/istio/pkg/test/conformance/constraint"
 	"istio.io/istio/pkg/test/framework"
+	"istio.io/istio/pkg/test/framework/components/echo"
+	"istio.io/istio/pkg/test/framework/components/echo/echoboot"
 	"istio.io/istio/pkg/test/framework/components/environment"
 	"istio.io/istio/pkg/test/framework/components/galley"
 	"istio.io/istio/pkg/test/framework/components/namespace"
+	"istio.io/istio/pkg/test/framework/components/pilot"
 	"istio.io/istio/pkg/test/framework/label"
+	"istio.io/istio/pkg/test/util/structpath"
+
+	envoyAdmin "github.com/envoyproxy/go-control-plane/envoy/admin/v2alpha"
+	"github.com/go-yaml/yaml"
 )
 
 func TestConformance(t *testing.T) {
@@ -36,6 +45,7 @@ func TestConformance(t *testing.T) {
 		}
 
 		gal := galley.NewOrFail(ctx, ctx, galley.Config{})
+		p := pilot.NewOrFail(ctx, ctx, pilot.Config{Galley: gal})
 
 		for _, ca := range cases {
 			tst := ctx.NewSubTest(ca.Metadata.Name)
@@ -49,15 +59,15 @@ func TestConformance(t *testing.T) {
 			}
 
 			if ca.Metadata.Isolated {
-				tst.Run(runCaseFn(gal, ca))
+				tst.Run(runCaseFn(p, gal, ca))
 			} else {
-				tst.RunParallel(runCaseFn(gal, ca))
+				tst.RunParallel(runCaseFn(p, gal, ca))
 			}
 		}
 	})
 }
 
-func runCaseFn(gal galley.Instance, ca *conformance.Test) func(framework.TestContext) {
+func runCaseFn(p pilot.Instance, gal galley.Instance, ca *conformance.Test) func(framework.TestContext) {
 	return func(ctx framework.TestContext) {
 		match := true
 	mainloop:
@@ -88,21 +98,21 @@ func runCaseFn(gal galley.Instance, ca *conformance.Test) func(framework.TestCon
 			}
 		}
 
-		ns := namespace.NewOrFail(ctx, ctx, "conv", true)
+		ns := namespace.NewOrFail(ctx, ctx, "conf", true)
 
 		if len(ca.Stages) == 1 {
-			runStage(ctx, gal, ns, ca.Stages[0])
+			runStage(ctx, p, gal, ns, ca.Stages[0])
 		} else {
 			for i, s := range ca.Stages {
 				ctx.NewSubTest(fmt.Sprintf("%d", i)).Run(func(ctx framework.TestContext) {
-					runStage(ctx, gal, ns, s)
+					runStage(ctx, p, gal, ns, s)
 				})
 			}
 		}
 	}
 }
 
-func runStage(ctx test.Failer, gal galley.Instance, ns namespace.Instance, s *conformance.Stage) {
+func runStage(ctx framework.TestContext, pil pilot.Instance, gal galley.Instance, ns namespace.Instance, s *conformance.Stage) {
 	if s.MeshConfig != nil {
 		gal.SetMeshConfigOrFail(ctx, *s.MeshConfig)
 	}
@@ -115,6 +125,9 @@ func runStage(ctx test.Failer, gal galley.Instance, ns namespace.Instance, s *co
 
 	if s.MCP != nil {
 		validateMCPState(ctx, gal, ns, s)
+	}
+	if s.Traffic != nil {
+		validateTraffic(ctx, pil, gal, ns, s)
 	}
 
 	// More and different types of validations can go here
@@ -149,4 +162,90 @@ func validateMCPState(ctx test.Failer, gal galley.Instance, ns namespace.Instanc
 		})
 	}
 
+}
+
+func DomainAcceptFunc(domains []string) func(*envoyAdmin.ConfigDump) (bool, error) {
+	return func(cfg *envoyAdmin.ConfigDump) (bool, error) {
+		validator := structpath.ForProto(cfg)
+		// virtualHosts.domains
+		const q = "{.configs[*].dynamicRouteConfigs[*].routeConfig.virtualHosts[*].domains[?(@ == %q)]}"
+		for _, domain := range domains {
+			// TODO(qfel): Figure out how to get rid of the loop.
+			if err := validator.Exists(q, domain).Check(); err != nil {
+				return false, err
+			}
+		}
+		return true, nil
+	}
+}
+
+func validateTraffic(ctx framework.TestContext, pil pilot.Instance, gal galley.Instance, ns namespace.Instance, stage *conformance.Stage) {
+	echos := make([]echo.Instance, len(stage.Traffic.Services))
+	b := echoboot.NewBuilderOrFail(ctx, ctx)
+	for i, svc := range stage.Traffic.Services {
+		b = b.With(&echos[i], echo.Config{
+			Galley:    gal,
+			Pilot:     pil,
+			Service:   svc.Name,
+			Namespace: ns,
+			Ports:     svc.Ports,
+		})
+	}
+	if err := b.Build(); err != nil {
+		ctx.Fatal(err)
+	}
+
+	services := make(map[string]echo.Instance)
+	for i, svc := range echos {
+		services[stage.Traffic.Services[i].Name] = svc
+		svc.WaitUntilCallableOrFail(ctx, echos...)
+	}
+
+	ready := make(map[string]bool)
+	var vHosts []string
+
+	var inputs []map[interface{}]interface{}
+	for _, inputYAML := range strings.Split(stage.Input, "\n---\n") {
+		var input map[interface{}]interface{}
+		if err := yaml.Unmarshal([]byte(inputYAML), &input); err != nil {
+			ctx.Fatal(err)
+		}
+		inputs = append(inputs, input)
+	}
+	for _, res := range inputs {
+		if res["apiVersion"] != "networking.istio.io/v1alpha3" || res["kind"] != "VirtualService" {
+			continue
+		}
+		spec := res["spec"].(map[interface{}]interface{})
+		hosts := spec["hosts"].([]interface{})
+		for _, h := range hosts {
+			vHosts = append(vHosts, h.(string))
+		}
+	}
+
+	for _, call := range stage.Traffic.Calls {
+		caller := services[call.Caller]
+		if !ready[call.Caller] {
+			ctx.Logf("Waiting for sidecar(s) for %s to contain domains: %s", call.Caller, strings.Join(vHosts, ", "))
+			for _, w := range caller.WorkloadsOrFail(ctx) {
+				w.Sidecar().WaitForConfigOrFail(ctx, DomainAcceptFunc(vHosts))
+			}
+			ready[call.Caller] = true
+		}
+
+		resp := caller.CallOrFail(ctx, echo.CallOptions{
+			Target:   services[call.Callee],
+			PortName: "http",
+			Host:     call.Host,
+			Path:     call.Path,
+			Count:    call.Count,
+			Headers: http.Header{
+				"Host": []string{call.Host},
+			},
+		})
+		// TODO(qfel): Check constraints.
+		for _, r := range resp {
+			ctx.Logf(r.Body)
+		}
+	}
 }
