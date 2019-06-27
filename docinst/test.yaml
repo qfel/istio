@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debug
+spec:
+  restartPolicy: Never
+  containers:
+  - name: debug
+    image: istionightly/base_debug:latest
+    command:
+    - sleep
+    - '9999999'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-a
+spec:
+  ports:
+  - port: 9081
+    name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-b
+spec:
+  ports:
+  - port: 9082
+    name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-cd
+spec:
+  ports:
+  - port: 9083
+    name: http-c
+  - port: 9084
+    name: http-d
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: v-svc-cd
+spec:
+  hosts:
+  - svc-cd
+  http:
+  - match:
+    - uri:
+        exact: /v-svc-cd
+    route:
+    - destination:
+        host: svc-cd
+  - match:
+    - uri:
+        exact: /v-svc-cd/filter/c
+    - port: 9083
+    route:
+    - destination:
+        host: svc-cd
+        port:
+          number: 9083
+  - match:
+    - uri:
+        exact: /v-svc-cd/filter/d
+    - port: 9084
+    route:
+    - destination:
+        host: svc-cd
+        port:
+          number: 9084
+  - match:
+    - uri:
+        exact: /v-svc-cd/c
+    route:
+    - destination:
+        host: svc-cd
+        port:
+          number: 9083
+  - match:
+    - uri:
+        exact: /v-svc-cd/d
+    route:
+    - destination:
+        host: svc-cd
+        port:
+          number: 9084
+---
+# VS for service A and a unique host.
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: v-partial-svc-a
+spec:
+  hosts:
+  - svc-a
+  - partial
+  http:
+  - match:
+    - uri:
+        exact: /v-partial-svc-a
+    route:
+    - destination:
+        host: svc-a
+---
+# VS for services A and B.
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: v-multi
+spec:
+  hosts:
+  - svc-a
+  - svc-b
+  http:
+  - match:
+    - uri:
+        exact: /v-multi/a
+    route:
+    - destination:
+        host: svc-a
+  - match:
+    - uri:
+        exact: /v-multi/b
+    route:
+    - destination:
+        host: svc-b

@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+import json
+import re
+import sys
+import yaml
+
+
+def natSort(xs, attr=None, _re=re.compile(r'(\d+)')):
+  def key(x):
+    if attr:
+      x = x[attr]
+    return [int(s) if s.isdigit() else s for s in _re.split(x)]
+
+  xs.sort(key=key)
+
+
+def convert(cfgs):
+  out = {}
+  for cfg in cfgs['configs']:
+    t = cfg['@type']
+    if t == 'type.googleapis.com/envoy.admin.v2alpha.ListenersConfigDump':
+      out['listeners'] = convertListeners(cfg)
+    elif t == 'type.googleapis.com/envoy.admin.v2alpha.RoutesConfigDump':
+      out['routes'] = convertRoutes(cfg)
+  return out
+
+
+def convertListeners(cfg):
+  out = []
+  for dal in cfg['dynamic_active_listeners']:
+    addr = dal['listener']['address']['socket_address']
+    out.append(f'{addr["address"]}:{addr["port_value"]}')
+  natSort(out)
+  return out
+
+
+def convertRoutes(cfg):
+  out = []
+  for route in cfg['dynamic_route_configs']:
+    r = convertRoute(route['route_config'])
+    if r:
+      out.append(r)
+  natSort(out, attr='_name')
+  return out
+
+
+def convertRoute(cfg):
+  vhs = []
+  for vh in cfg['virtual_hosts']:
+    name = vh['name']
+    if name == 'allow_any' or 'istio' in name:
+      continue
+    vhs.append(convertVirtualHost(vh))
+  if not vhs:
+    return None
+  natSort(vhs, attr='_name')
+  return {
+      '_name': cfg['name'],
+      'virtual_hosts': vhs,
+  }
+
+
+def convertVirtualHost(cfg):
+  rs = []
+  for r in cfg['routes']:
+    m = r['match']
+    p = m.get('path')
+    if p is None:
+      p = m.get('prefix')
+      if p:
+        p += '*'
+      else:
+        p = '?'
+    d = r['route']['cluster']
+    rs.append(f'{p} -> {d}')
+  natSort(rs)
+  natSort(cfg['domains'])
+  return {
+      '_name': cfg['name'],
+      'domains': cfg['domains'],
+      'routes': rs,
+  }
+
+
+def main():
+  input = json.load(sys.stdin)
+  print(yaml.dump(convert(input), default_flow_style=False))
+
+
+if __name__ == '__main__':
+  main()
