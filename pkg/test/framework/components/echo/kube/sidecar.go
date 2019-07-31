@@ -17,10 +17,8 @@ package kube
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	envoyAdmin "github.com/envoyproxy/go-control-plane/envoy/admin/v2alpha"
-	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gogo/protobuf/proto"
 	"github.com/gogo/protobuf/types"
 
@@ -171,7 +169,8 @@ func (s *sidecar) adminRequest(path string, out proto.Message) error {
 			s.podNamespace, s.podName, err, command, response)
 	}
 
-	if err := jsonpb.Unmarshal(strings.NewReader(response), out); err != nil {
+	// if err := jsonpb.Unmarshal(strings.NewReader(response), out); err != nil {
+	if err := common.UnmarshalScrubAny([]byte(response), out); err != nil {
 		return fmt.Errorf("failed parsing Envoy admin response from '/%s': %v\nResponse JSON: %s", path, err, response)
 	}
 	return nil

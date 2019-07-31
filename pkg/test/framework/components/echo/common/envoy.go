@@ -15,12 +15,16 @@
 package common
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	envoyAdmin "github.com/envoyproxy/go-control-plane/envoy/admin/v2alpha"
 	"github.com/gogo/protobuf/jsonpb"
+	"github.com/gogo/protobuf/proto"
 
 	"istio.io/istio/pkg/test/framework/components/echo"
 	"istio.io/istio/pkg/test/util/retry"
@@ -148,4 +152,72 @@ func routeName(target echo.Instance, port echo.Port) string {
 
 func listenerName(address string, port echo.Port) string {
 	return fmt.Sprintf("%s_%d", address, port.ServicePort)
+}
+
+func scrubMap(m map[string]interface{}) bool {
+	const typeField = "@type"
+	x, ok := m[typeField]
+	if !ok {
+		return false
+	}
+	name, ok := x.(string)
+	if !ok {
+		return false
+	}
+	print(">>> ", name, "\n")
+	const pref = "type.googleapis.com/"
+	if !strings.HasPrefix(name, pref) {
+		return false
+	}
+	name = name[len(pref):]
+	if proto.MessageType(name) != nil {
+		print("<<< ", fmt.Sprintf("%s", proto.MessageType(name)), "\n")
+		return false
+	}
+	m[typeField] = pref + "google.protobuf.Empty"
+	m["value"] = map[string]interface{}{}
+	return true
+	delete(m, typeField)
+	bs, err := json.Marshal(m)
+	if err != nil {
+		panic(err)
+	}
+	for k := range m {
+		delete(m, k)
+	}
+	m[typeField] = "unknown/" + name
+	m["json"] = string(bs)
+	return true
+}
+
+func scrubAny(x interface{}) {
+	switch x := x.(type) {
+	case map[string]interface{}:
+		if scrubMap(x) {
+			return
+		}
+		for _, v := range x {
+			scrubAny(v)
+		}
+	case []interface{}:
+		for _, y := range x {
+			scrubAny(y)
+		}
+	}
+}
+
+// UnmarshalScrubAny unmarshals specified JSON into a proto.Message. Fields of proto.Any that refer
+// unknown message types are converted to special placeholder values and the conversion continues.
+func UnmarshalScrubAny(bs []byte, msg proto.Message) error {
+	var obj interface{}
+	if err := json.Unmarshal(bs, &obj); err != nil {
+		return err
+	}
+	scrubAny(obj)
+	bs, err := json.Marshal(obj)
+	if err != nil {
+		return err
+	}
+	print(string(bs), "\n")
+	return jsonpb.Unmarshal(bytes.NewReader(bs), msg)
 }
