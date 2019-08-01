@@ -57,9 +57,9 @@ func (b *builder) Build() error {
 		return err
 	}
 
-	if err := b.waitUntilAllCallable(instances); err != nil {
-		return err
-	}
+	// if err := b.waitUntilAllCallable(instances); err != nil {
+	// 	return err
+	// }
 
 	// Success... update the caller's references.
 	for i, inst := range instances {

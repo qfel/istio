@@ -194,6 +194,7 @@ func (c *instance) WaitUntilCallable(instances ...echo.Instance) error {
 	for _, w := range c.workloads {
 		if w.sidecar != nil {
 			if err := w.sidecar.WaitForConfig(common.OutboundConfigAcceptFunc(instances...)); err != nil {
+				panic(err)
 				return err
 			}
 		}

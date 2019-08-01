@@ -16,6 +16,7 @@ package conformance
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -228,21 +229,34 @@ func virtualServiceHosts(ctx test.Failer, resources string) []string {
 func validateTraffic(t framework.TestContext, pil pilot.Instance, gal galley.Instance, ns namespace.Instance, stage *conformance.Stage) {
 	echos := make([]echo.Instance, len(stage.Traffic.Services))
 	b := echoboot.NewBuilderOrFail(t, t)
+	negAnn := echo.Annotation{
+		Name: "cloud.google.com/neg",
+		Type: echo.ServiceAnnotation,
+	}
 	for i, svc := range stage.Traffic.Services {
 		var ports []echo.Port
+		annPorts := make(map[string]struct{})
 		for _, p := range svc.Ports {
 			ports = append(ports, echo.Port{
 				Name:        p.Name,
 				Protocol:    protocol.Instance(p.Protocol),
 				ServicePort: int(p.ServicePort),
 			})
+			annPorts[strconv.Itoa(int(p.ServicePort))] = struct{}{}
+		}
+		ann, err := json.Marshal(map[string]interface{}{
+			"exposed_ports": annPorts,
+		})
+		if err != nil {
+			t.Fatalf("Marshal: %v", err)
 		}
 		b = b.With(&echos[i], echo.Config{
-			Galley:    gal,
-			Pilot:     pil,
-			Service:   svc.Name,
-			Namespace: ns,
-			Ports:     ports,
+			Galley:      gal,
+			Pilot:       pil,
+			Service:     svc.Name,
+			Namespace:   ns,
+			Ports:       ports,
+			Annotations: echo.Annotations{negAnn: &echo.AnnotationValue{string(ann)}},
 		})
 	}
 	if err := b.Build(); err != nil {
@@ -252,7 +266,7 @@ func validateTraffic(t framework.TestContext, pil pilot.Instance, gal galley.Ins
 	services := make(map[string]echo.Instance)
 	for i, svc := range echos {
 		services[stage.Traffic.Services[i].Name] = svc
-		svc.WaitUntilCallableOrFail(t, echos...)
+		// svc.WaitUntilCallableOrFail(t, echos...)
 	}
 
 	ready := make(map[string]bool)
@@ -317,7 +331,7 @@ func validateTraffic(t framework.TestContext, pil pilot.Instance, gal galley.Ins
 func validateWithRedo(t framework.TestContext, f func(context.Context) bool) {
 	const (
 		pollDelay           = time.Second // How much to wait after a failed attempt.
-		firstSuccessTimeout = time.Minute
+		firstSuccessTimeout = 10*time.Minute
 		// After the traffic flows successfully for the first time, repeat according to the parameters
 		// below.
 		redoAttempts = 10

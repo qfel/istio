@@ -164,14 +164,12 @@ func scrubMap(m map[string]interface{}) bool {
 	if !ok {
 		return false
 	}
-	print(">>> ", name, "\n")
 	const pref = "type.googleapis.com/"
 	if !strings.HasPrefix(name, pref) {
 		return false
 	}
 	name = name[len(pref):]
 	if proto.MessageType(name) != nil {
-		print("<<< ", fmt.Sprintf("%s", proto.MessageType(name)), "\n")
 		return false
 	}
 	m[typeField] = pref + "google.protobuf.Empty"
@@ -218,6 +216,5 @@ func UnmarshalScrubAny(bs []byte, msg proto.Message) error {
 	if err != nil {
 		return err
 	}
-	print(string(bs), "\n")
 	return jsonpb.Unmarshal(bytes.NewReader(bs), msg)
 }
