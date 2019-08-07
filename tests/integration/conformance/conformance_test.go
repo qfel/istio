@@ -130,7 +130,9 @@ func runStage(ctx framework.TestContext, pil pilot.Instance, gal galley.Instance
 		gal.SetMeshConfigOrFail(ctx, *s.MeshConfig)
 	}
 
-	i := s.Input
+	i := tmpl.EvaluateOrFail(ctx, s.Input, constraint.Params{
+		Namespace: ns.Name(),
+	})
 	gal.ApplyConfigOrFail(ctx, ns, i)
 	defer func() {
 		gal.DeleteConfigOrFail(ctx, ns, i)

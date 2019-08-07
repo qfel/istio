@@ -20,10 +20,10 @@ spec:
         exact: /echo1
     route:
     - destination:
-        host: echo1
+        host: echo1.{{.Namespace}}.svc.cluster.local
   - match:
     - uri:
         exact: /echo2
     route:
     - destination:
-        host: echo2
+        host: echo2.{{.Namespace}}.svc.cluster.local
