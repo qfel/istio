@@ -51,9 +51,11 @@ spec:
 {{- end }}
   ports:
 {{- range $i, $p := .Ports }}
+{{- if ne $p.Name "grpc" }}
   - name: {{ $p.Name }}
     port: {{ $p.ServicePort }}
     targetPort: {{ $p.InstancePort }}
+{{- end }}
 {{- end }}
   selector:
     app: {{ .Service }}
@@ -110,7 +112,7 @@ spec:
           - "{{ .Version }}"
         ports:
 {{- range $i, $p := .ContainerPorts }}
-        - containerPort: {{ $p.Port }} 
+        - containerPort: {{ $p.Port }}
 {{- if eq .Port 3333 }}
           name: tcp-health-port
 {{- end }}
