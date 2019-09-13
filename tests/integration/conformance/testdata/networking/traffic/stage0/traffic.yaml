@@ -16,11 +16,11 @@ services:
     protocol: HTTP
 
 calls:
-# - caller: echo
-#   url: http://dispatch:8080/echo1
-#   response:
-#     code: 200
-#     callee: echo1-*
+- caller: echo
+  url: http://dispatch:8080/echo1
+  response:
+    code: 200
+    callee: echo1-*
 
 - caller: echo
   url: http://dispatch.{{.Namespace}}.svc.cluster.local:8080/echo1
