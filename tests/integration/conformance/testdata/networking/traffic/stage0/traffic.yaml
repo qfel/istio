@@ -16,42 +16,49 @@ services:
     protocol: HTTP
 
 calls:
-- caller: echo
+- name: unqual-vs
+  caller: echo
   url: http://dispatch:8080/echo1
   response:
     code: 200
     callee: echo1-*
 
-- caller: echo
+- name: qual-vs-1
+  caller: echo
   url: http://dispatch.{{.Namespace}}.svc.cluster.local:8080/echo1
   response:
     code: 200
     callee: echo1-*
 
-- caller: echo
+- name: qual-vs-2
+  caller: echo
   url: http://dispatch.{{.Namespace}}.svc.cluster.local:8080/echo2
   response:
     code: 200
     callee: echo2-*
 
-- caller: echo
+- name: qual-vs-404
+  caller: echo
   url: http://dispatch.{{.Namespace}}.svc.cluster.local:8080/whatever
   response:
     code: 404
 
-- caller: echo
+- name: unqual-svc
+  caller: echo
   url: http://echo:8080/whatever
   response:
     code: 200
     callee: echo-*
 
-- caller: echo
+- name: semi-qual-svc
+  caller: echo
   url: http://echo.{{.Namespace}}:8080/whatever
   response:
     code: 200
     callee: echo-*
 
-- caller: echo
+- name: qual-svc
+  caller: echo
   url: http://echo.{{.Namespace}}.svc.cluster.local:8080/whatever
   response:
     code: 200
