@@ -17,7 +17,6 @@ package conformance
 import (
 	"context"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -45,14 +44,6 @@ import (
 	"istio.io/istio/pkg/test/util/structpath"
 	"istio.io/istio/pkg/test/util/tmpl"
 )
-
-var firstSuccessTimeout time.Duration
-
-func init() {
-	flag.DurationVar(&firstSuccessTimeout, "istio.test.conformance.firstSuccessTimeout", time.Minute,
-		"How long to initially wait for a test to succeed.")
-
-}
 
 func TestConformance(t *testing.T) {
 	framework.Run(t, func(ctx framework.TestContext) {
@@ -338,7 +329,8 @@ func validateTraffic(t framework.TestContext, pil pilot.Instance, gal galley.Ins
 
 func validateWithRedo(t framework.TestContext, f func(context.Context) bool) {
 	const (
-		pollDelay = time.Second // How much to wait after a failed attempt.
+		pollDelay           = time.Second // How much to wait after a failed attempt.
+		firstSuccessTimeout = 5 * time.Minute
 		// After the traffic flows successfully for the first time, repeat according to the parameters
 		// below.
 		redoAttempts = 10
