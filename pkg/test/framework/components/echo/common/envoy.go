@@ -17,7 +17,6 @@ package common
 import (
 	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	envoyAdmin "github.com/envoyproxy/go-control-plane/envoy/admin/v2alpha"
@@ -45,9 +44,7 @@ type ConfigFetchFunc func() (*envoyAdmin.ConfigDump, error)
 type ConfigAcceptFunc func(*envoyAdmin.ConfigDump) (bool, error)
 
 func WaitForConfig(fetch ConfigFetchFunc, accept ConfigAcceptFunc, options ...retry.Option) error {
-	if os.Getenv("ISTIO_TEST_NO_WAIT") != "" {
-		return nil
-	}
+	return nil
 	options = append([]retry.Option{retry.Delay(defaultConfigDelay), retry.Timeout(defaultConfigTimeout)}, options...)
 
 	var cfg *envoyAdmin.ConfigDump
